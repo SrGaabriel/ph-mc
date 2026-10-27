@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
-# Seeds a per-user Prism data dir with the Purdue Hackers instance on first run, then starts Prism.
-#   PH_PRISM     Prism binary
-#   PH_TEMPLATE  dir holding prismlauncher.cfg and instances/
+# Seeds a per-user Freesm Launcher data dir with the Purdue Hackers instance on first run, then starts it.
+#   PH_LAUNCHER  Freesm Launcher binary
+#   PH_TEMPLATE  dir holding freesmlauncher.cfg and instances/
 #   PH_DATA      per-user data dir
-#   PH_JAVA      optional: pin this Java instead of Prism's auto-download (NixOS can't run downloaded JREs)
+#   PH_JAVA      optional: pin this Java instead of the launcher's auto-download (NixOS can't run downloaded JREs)
+#   PH_PACK_URL  optional: install from this pack.toml instead (testing; persists in this data dir)
 set -euo pipefail
 
 inst="$PH_DATA/instances/Purdue Hackers"
 mkdir -p "$PH_DATA/instances"
 
-if [ ! -e "$PH_DATA/prismlauncher.cfg" ]; then
-  cp "$PH_TEMPLATE/prismlauncher.cfg" "$PH_DATA/"
-  chmod u+w "$PH_DATA/prismlauncher.cfg"
+if [ ! -e "$PH_DATA/freesmlauncher.cfg" ]; then
+  cp "$PH_TEMPLATE/freesmlauncher.cfg" "$PH_DATA/"
+  chmod u+w "$PH_DATA/freesmlauncher.cfg"
 fi
 if [ ! -d "$inst" ]; then
   cp -R "$PH_TEMPLATE/instances/Purdue Hackers" "$inst"
@@ -21,11 +22,13 @@ fi
 cp -f "$PH_TEMPLATE/instances/Purdue Hackers/minecraft/packwiz-installer-bootstrap.jar" "$inst/minecraft/"
 chmod u+w "$inst/minecraft/packwiz-installer-bootstrap.jar"
 
-# set_key FILE KEY VALUE: replace KEY in [General], or add it right after the header
+# set_key FILE KEY VALUE: replace KEY in [General], or append it to that section.
+# Values go through ENVIRON because awk -v would eat backslashes.
 set_key() {
   local tmp
   tmp="$(mktemp)"
-  awk -v k="$2" -v v="$3" '
+  K="$2" V="$3" awk '
+    BEGIN { k = ENVIRON["K"]; v = ENVIRON["V"] }
     /^\[/ { if (sec == "[General]" && !done) { print k "=" v; done = 1 } sec = $0 }
     sec == "[General]" && index($0, k "=") == 1 { if (!done) print k "=" v; done = 1; next }
     { print }
@@ -36,11 +39,16 @@ set_key() {
 }
 
 if [ -n "${PH_JAVA:-}" ]; then
-  set_key "$PH_DATA/prismlauncher.cfg" AutomaticJavaSwitch false
-  set_key "$PH_DATA/prismlauncher.cfg" AutomaticJavaDownload false
+  set_key "$PH_DATA/freesmlauncher.cfg" AutomaticJavaSwitch false
+  set_key "$PH_DATA/freesmlauncher.cfg" AutomaticJavaDownload false
   set_key "$inst/instance.cfg" AutomaticJava false
   set_key "$inst/instance.cfg" OverrideJavaLocation true
   set_key "$inst/instance.cfg" JavaPath "$PH_JAVA"
 fi
 
-exec "$PH_PRISM" --dir "$PH_DATA" "$@"
+if [ -n "${PH_PACK_URL:-}" ]; then
+  # Same quoting the launcher writes: "\"$INST_JAVA\" -jar ..."
+  set_key "$inst/instance.cfg" PreLaunchCommand "\"\\\"\$INST_JAVA\\\" -jar packwiz-installer-bootstrap.jar $PH_PACK_URL\""
+fi
+
+exec "$PH_LAUNCHER" --dir "$PH_DATA" "$@"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 here="$(cd "$(dirname "$(readlink -f "$0")")" && pwd)"
-export PH_PRISM="$here/prism/PrismLauncher"
+export PH_LAUNCHER="$here/freesm/FreesmLauncher"
 export PH_TEMPLATE="$here/template"
 export PH_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/ph-mc"
 exec bash "$here/run.sh" "$@"

@@ -6,7 +6,7 @@
   <key>CFBundleDisplayName</key><string>Purdue Hackers Minecraft</string>
   <key>CFBundleIdentifier</key><string>sh.phack.mc</string>
   <key>CFBundleExecutable</key><string>ph-mc</string>
-  <key>CFBundleIconFile</key><string>PrismLauncher</string>
+  <key>CFBundleIconFile</key><string>FreesmLauncher</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>1.0</string>
   <key>LSMinimumSystemVersion</key><string>12.0</string>
