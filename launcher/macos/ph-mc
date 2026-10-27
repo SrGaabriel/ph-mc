@@ -1,0 +1,6 @@
+#!/bin/bash
+res="$(cd "$(dirname "$0")/../Resources" && pwd)"
+export PH_PRISM="$res/Prism Launcher.app/Contents/MacOS/prismlauncher"
+export PH_TEMPLATE="$res/template"
+export PH_DATA="$HOME/Library/Application Support/PurdueHackersMinecraft"
+exec bash "$res/run.sh" "$@"

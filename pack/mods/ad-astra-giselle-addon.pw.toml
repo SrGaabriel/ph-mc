@@ -1,0 +1,13 @@
+name = "Ad-Astra: Giselle Addon"
+filename = "Ad-Astra-Giselle-Addon-neoforge-1.21.1-8.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/XQDxCBVw/versions/ACL2XPNJ/Ad-Astra-Giselle-Addon-neoforge-1.21.1-8.1.jar"
+hash-format = "sha512"
+hash = "f87db7faf700c8b4f8ee7090060ca2f9999bab34ec384600d8daa4b80d861d5ed5d750a96a318ae1872a8891221cdc22c99265e6ecf6ec91f624a58795ced598"
+
+[update]
+[update.modrinth]
+mod-id = "XQDxCBVw"
+version = "ACL2XPNJ"

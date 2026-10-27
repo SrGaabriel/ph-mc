@@ -1,0 +1,13 @@
+name = "Dungeons And Villages: Ad Astra"
+filename = "Dungeon And Village Ad Astra 1.21.1  1.1.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/u9zCDhSS/versions/EsOArRBM/Dungeon%20And%20Village%20Ad%20Astra%201.21.1%20%201.1.1.jar"
+hash-format = "sha512"
+hash = "2460df9c5943710753e4725bb4530c297aeaafe579c9d5dd15eda6383989094af650ae8c6a2a382cb06c2ac00a8f70e4527b6be1d922adaaa04c6eeb010549ab"
+
+[update]
+[update.modrinth]
+mod-id = "u9zCDhSS"
+version = "EsOArRBM"

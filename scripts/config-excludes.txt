@@ -1,0 +1,16 @@
+# Per-user or generated state that must not ship in the pack (rsync exclude patterns, relative to minecraft/)
+config/servercore/
+config/spark/tmp/
+config/spark/tmp-client/
+config/voicechat/username-cache.json
+config/voicechat/voicechat-client.properties
+config/voicechat/player-volumes.properties
+config/voicechat/category-volumes.properties
+config/fancymenu/user_variables.db
+config/ars_nouveau/doc_data.json
+config/ars_nouveau/search_index/
+config/sodium-fingerprint.json
+config/etf_warnings.json
+config/xaeropatreon.txt
+*.bak
+*.tmp

@@ -1,0 +1,13 @@
+name = "Ad Astra: More Structures"
+filename = "ad_astra_more_structures-1.21.1-neoforge.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/1Z4JHpyZ/versions/vlaouoTu/ad_astra_more_structures-1.21.1-neoforge.jar"
+hash-format = "sha512"
+hash = "c96b191c95f68feb5472f200024982116b78284eed868e963d7d3a93f5296a3151c1ac10b2103cb0d44588355022c86ed5df64edb6297e02d3d9ab7a34d5fa40"
+
+[update]
+[update.modrinth]
+mod-id = "1Z4JHpyZ"
+version = "vlaouoTu"

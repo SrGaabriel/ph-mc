@@ -1,0 +1,13 @@
+name = "Purdue Hackers"
+author = "Purdue Hackers"
+version = "0.1.0"
+pack-format = "packwiz:1.1.0"
+
+[index]
+file = "index.toml"
+hash-format = "sha256"
+hash = "dd251f82fa5a3e851b7beeff5e84a04cc8fc7391dec07bde57f8b3c514e9bd05"
+
+[versions]
+minecraft = "1.21.1"
+neoforge = "21.1.265"

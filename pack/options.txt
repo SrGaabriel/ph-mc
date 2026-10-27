@@ -1,0 +1,13 @@
+version:3955
+lang:en_us
+renderDistance:10
+simulationDistance:8
+maxFps:90
+enableVsync:false
+guiScale:0
+onboardAccessibility:false
+skipMultiplayerWarning:true
+joinedFirstServer:true
+tutorialStep:none
+resourcePacks:["vanilla","mod_resources","moonlight:merged_pack","mod/meadow:resourcepacks/betterleaves","mod/meadow:resourcepacks/connectedtexturesupport","supplementaries:darker_ropes"]
+incompatibleResourcePacks:[]

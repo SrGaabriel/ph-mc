@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Purdue Hackers Minecraft</title>
+<meta name="description" content="The Purdue Hackers modded Minecraft server. One download, sign in once, press Play.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pixel: "Pixelify Sans", ui-monospace, monospace;
+    --sky-1: #6f9df5; --sky-2: #7eaaf8; --sky-3: #8fb7fb; --sky-4: #a3c6fd;
+    --text: #ececec;
+    --muted: #b4ada3;
+    --gold: #ffd84a;
+    --shadow: #2e2a24;
+    --panel: rgba(16, 11, 7, .72);
+    --dirt-c: #6c4c33;
+    --stone-c: #6f6f6f;
+    --bedrock-c: #2b2b2b;
+    --night: 0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --sky-1: #070a1f; --sky-2: #0b1030; --sky-3: #111842; --sky-4: #19225a;
+      --night: 1;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--dirt-c); }
+  body {
+    margin: 0;
+    color: var(--text);
+    font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--dirt-c);
+  }
+  img, .tex { image-rendering: pixelated; image-rendering: crisp-edges; }
+  a { color: inherit; }
+  code { font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace; font-size: .92em; }
+  [hidden] { display: none !important; }
+
+  /* ---------- the world (hero) ---------- */
+  .world {
+    position: relative; overflow: hidden;
+    min-height: min(92vh, 760px);
+    display: flex; flex-direction: column;
+    background: linear-gradient(var(--sky-1) 0 22%, var(--sky-2) 22% 44%, var(--sky-3) 44% 66%, var(--sky-4) 66%);
+  }
+  .sky { position: absolute; inset: 0; pointer-events: none; }
+  .sun {
+    position: absolute; top: 9%; right: 12%;
+    width: 72px; height: 72px; background: #fff8c4;
+    box-shadow: 0 0 0 10px rgba(255, 233, 120, .55), 0 0 0 22px rgba(255, 233, 120, .2);
+    opacity: calc(1 - var(--night));
+  }
+  .moon { position: absolute; top: 10%; right: 13%; width: 64px; opacity: var(--night); }
+  .stars { position: absolute; inset: 0 0 30% 0; opacity: var(--night); }
+  .stars i { position: absolute; width: 3px; height: 3px; background: #fff; animation: twinkle 3s steps(2) infinite; }
+  .stars i.big { width: 5px; height: 5px; }
+  @keyframes twinkle { 50% { opacity: .25; } }
+  .cloud {
+    position: absolute; left: 0; opacity: .92;
+    animation: drift var(--d) linear infinite; animation-delay: var(--delay);
+  }
+  @media (prefers-color-scheme: dark) { .cloud { opacity: .18; } }
+  @keyframes drift { from { transform: translateX(-320px); } to { transform: translateX(110vw); } }
+
+  .hero {
+    position: relative; z-index: 1; flex: 1;
+    max-width: 760px; width: 100%; margin: 0 auto;
+    padding: 72px 16px 48px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  }
+  .kicker {
+    font-family: var(--pixel); font-size: 18px; letter-spacing: .12em; text-transform: uppercase;
+    color: #fff; text-shadow: 2px 2px 0 var(--shadow); margin: 0 0 6px;
+    position: relative; z-index: 1;
+  }
+  .title-wrap { position: relative; display: inline-block; }
+  h1 {
+    font-family: var(--pixel); font-weight: 700;
+    font-size: clamp(52px, 13vw, 112px); line-height: .9; margin: 0;
+    color: #fff; letter-spacing: .01em;
+    text-shadow: 6px 6px 0 var(--shadow);
+  }
+  .splash {
+    position: absolute; right: -12px; bottom: -18px;
+    font-family: var(--pixel); font-weight: 600; font-size: clamp(15px, 3.4vw, 22px);
+    color: var(--gold); text-shadow: 2px 2px 0 #3f3a00; white-space: nowrap;
+    transform: rotate(-16deg); transform-origin: center;
+    animation: splash .45s ease-in-out infinite alternate;
+  }
+  @keyframes splash { to { transform: rotate(-16deg) scale(1.09); } }
+  .tagline {
+    margin: 40px 0 0; max-width: 540px;
+    color: #fff; font-size: 18px; font-weight: 500;
+    text-shadow: 2px 2px 0 var(--shadow), 0 0 12px rgba(30, 50, 110, .45);
+  }
+
+  .download { margin-top: 32px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .mc-btn {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 16px;
+    font-family: var(--pixel); font-weight: 600; font-size: clamp(20px, 5vw, 26px);
+    color: #fff; text-decoration: none; text-shadow: 3px 3px 0 #383838;
+    background-color: var(--stone-c); background-size: 48px;
+    border: 3px solid #000;
+    box-shadow: inset 4px 4px 0 rgba(255,255,255,.32), inset -4px -6px 0 rgba(0,0,0,.42);
+    padding: 16px 34px 20px 22px;
+    cursor: pointer;
+  }
+  .mc-btn img { width: 40px; height: 40px; }
+  .mc-btn:hover, .mc-btn:focus-visible { border-color: #fff; color: #ffffa0; outline: none; }
+  .mc-btn:active { box-shadow: inset 4px 6px 0 rgba(0,0,0,.42), inset -4px -4px 0 rgba(255,255,255,.18); padding-top: 18px; padding-bottom: 18px; }
+  .others { margin: 0; font-family: var(--pixel); font-size: 17px; color: #fff; text-shadow: 2px 2px 0 var(--shadow); }
+  .others button {
+    background: none; border: 0; padding: 0 2px; font: inherit; color: inherit; text-shadow: inherit;
+    cursor: pointer; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px;
+  }
+  .others button:hover { color: #ffffa0; }
+  .others button[aria-pressed="true"] { color: var(--gold); text-decoration: none; }
+  .mobile-note { margin: 0; font-family: var(--pixel); color: var(--gold); text-shadow: 2px 2px 0 var(--shadow); }
+
+  .cmd {
+    display: flex; align-items: center; gap: 10px; max-width: 100%;
+    background: rgba(0,0,0,.78); border: 3px solid #000;
+    box-shadow: inset 0 0 0 2px #444;
+    padding: 12px 12px 12px 16px; color: #fff; text-align: left;
+  }
+  .cmd code { overflow-x: auto; white-space: nowrap; }
+  .cmd code::before { content: "$ "; color: #7cd37c; }
+
+  .copy {
+    flex: none; font-family: var(--pixel); font-size: 15px; color: #fff; text-shadow: 2px 2px 0 #383838;
+    background: var(--stone-c); background-size: 32px; border: 2px solid #000;
+    box-shadow: inset 2px 2px 0 rgba(255,255,255,.3), inset -2px -3px 0 rgba(0,0,0,.4);
+    padding: 3px 12px 5px; cursor: pointer;
+  }
+  .copy:hover { border-color: #fff; color: #ffffa0; }
+
+  .ground { position: relative; height: 64px; background-color: #5d9b3a; background-size: 64px; background-repeat: repeat-x; }
+  .flora { position: absolute; left: 0; right: 0; bottom: 100%; height: 40px; pointer-events: none; }
+  .flora img { position: absolute; bottom: 0; animation: sway 2.6s steps(1) infinite; }
+  @keyframes sway { 50% { transform: translateX(2px); } }
+
+  /* ---------- underground ---------- */
+  .under {
+    background-color: var(--dirt-c);
+    background-size: 64px;
+    position: relative;
+  }
+  .under::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.62) 360px, rgba(0,0,0,.7));
+  }
+  .under > * { position: relative; }
+  main { max-width: 860px; margin: 0 auto; padding: 56px 16px 72px; display: grid; gap: 56px; }
+  h2 {
+    font-family: var(--pixel); font-weight: 600; font-size: 30px; margin: 0 0 18px;
+    color: #fff; text-shadow: 3px 3px 0 #000;
+  }
+  .panel {
+    background: var(--panel); border: 3px solid #000;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,.07);
+  }
+
+  /* server list entry */
+  .server { display: grid; grid-template-columns: 72px 1fr auto; gap: 16px; align-items: center; padding: 14px 18px 14px 14px; }
+  .server .icon { width: 72px; height: 72px; display: block; }
+  .server .name { font-family: var(--pixel); font-weight: 600; font-size: 22px; color: #fff; }
+  .server .motd { color: var(--muted); font-size: 15px; margin-top: 2px; }
+  .server .addr { margin-top: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .server .addr code { color: var(--gold); font-size: 16px; }
+  .status { text-align: right; font-family: var(--pixel); font-size: 16px; color: var(--muted); align-self: start; }
+  .status b { color: #fff; font-weight: 600; }
+  .bars { display: inline-flex; gap: 2px; align-items: flex-end; height: 16px; margin-left: 8px; vertical-align: -2px; }
+  .bars i { width: 4px; background: #333; }
+  .bars i:nth-child(1) { height: 4px; } .bars i:nth-child(2) { height: 7px; } .bars i:nth-child(3) { height: 10px; }
+  .bars i:nth-child(4) { height: 13px; } .bars i:nth-child(5) { height: 16px; }
+  .status.up .bars i { background: #3fd83f; }
+  .status.down .bars i { background: #8a2b2b; }
+
+  /* steps as inventory slots */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .steps li { padding: 18px; }
+  .slot {
+    width: 76px; height: 76px; display: grid; place-items: center; margin-bottom: 14px; position: relative;
+    background: #8b8b8b;
+    box-shadow: inset 4px 4px 0 #373737, inset -4px -4px 0 #ffffff;
+  }
+  .slot img { width: 48px; height: 48px; }
+  .steps li:hover .slot img { animation: bob .5s steps(2) infinite; }
+  @keyframes bob { 50% { transform: translateY(-3px); } }
+  .slot .n {
+    position: absolute; right: 5px; bottom: 1px;
+    font-family: var(--pixel); font-weight: 700; font-size: 22px; color: #fff; text-shadow: 2px 2px 0 #3f3f3f;
+  }
+  .steps h3 { font-family: var(--pixel); font-weight: 600; font-size: 22px; margin: 0 0 6px; color: #fff; }
+  .steps p { margin: 0; color: var(--muted); font-size: 16px; }
+  .steps p + p { margin-top: 10px; }
+  .steps em, .faq em { color: var(--text); font-style: normal; font-weight: 600; }
+  .steps code, .faq code { color: var(--gold); }
+  .heads-up { border-left: 4px solid var(--gold); padding-left: 10px; }
+
+  .faq { margin: 0; padding: 8px 22px; }
+  .faq > div { padding: 16px 0; }
+  .faq > div + div { border-top: 2px dashed rgba(255,255,255,.12); }
+  .faq dt { font-family: var(--pixel); font-weight: 600; font-size: 20px; color: #fff; }
+  .faq dd { margin: 4px 0 0; color: var(--muted); }
+
+  footer {
+    background-color: var(--bedrock-c); background-size: 64px;
+    border-top: 3px solid #000;
+  }
+  footer p {
+    max-width: 860px; margin: 0 auto; padding: 22px 16px;
+    font-family: var(--pixel); font-size: 17px; color: #ddd; text-shadow: 2px 2px 0 #000;
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+
+  .particle { position: fixed; width: 8px; height: 8px; pointer-events: none; z-index: 10; }
+
+  @media (max-width: 720px) {
+    .steps { grid-template-columns: 1fr; }
+    .server { grid-template-columns: 56px 1fr; }
+    .server .icon { width: 56px; height: 56px; }
+    .status { grid-column: 1 / -1; text-align: left; }
+    .hero { padding-top: 56px; }
+    .splash { right: 0; bottom: -26px; }
+    .sun, .moon { top: 2%; right: 4%; width: 44px; height: 44px; }
+    .sun { box-shadow: 0 0 0 6px rgba(255, 233, 120, .55); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; }
+    .cloud { display: none; }
+  }
+</style>
+</head>
+<body>
+<header class="world">
+  <div class="sky" aria-hidden="true">
+    <div class="stars" id="stars"></div>
+    <div class="sun"></div>
+    <img class="moon" data-sprite="moon" alt="">
+    <div id="clouds"></div>
+  </div>
+
+  <div class="hero">
+    <p class="kicker">Minecraft server</p>
+    <div class="title-wrap">
+      <h1>Purdue<br>Hackers</h1>
+      <span class="splash" id="splash">Hack the planet!</span>
+    </div>
+    <p class="tagline">Modded 1.21.1 with Create (airships included), Ars Nouveau, Iron's Spells, Terralith and proximity voice chat. Download it, sign in once, hit Play. It keeps itself up to date.</p>
+
+    <div class="download">
+      <a class="mc-btn tex" id="dl" href="#"><img data-sprite="grass" alt="">Download <span id="dl-os"></span></a>
+      <div class="cmd" id="nix" hidden>
+        <code id="nix-cmd"></code>
+        <button class="copy tex" data-copy="nix-cmd">Copy</button>
+      </div>
+      <p class="mobile-note" id="mobile" hidden>This runs on computers, so open this page on your laptop.</p>
+      <p class="others">
+        Not you?
+        <button data-os="windows">Windows</button>
+        <button data-os="macos">macOS</button>
+        <button data-os="linux">Linux</button>
+        <button data-os="nixos">NixOS</button>
+      </p>
+    </div>
+  </div>
+
+  <div class="ground tex" aria-hidden="true"><div class="flora" id="flora"></div></div>
+</header>
+
+<div class="under tex">
+  <main>
+    <section aria-label="Server">
+      <div class="server panel">
+        <img class="icon" data-sprite="grass" alt="">
+        <div>
+          <div class="name">Purdue Hackers</div>
+          <div class="motd" id="motd">Modded 1.21.1 · NeoForge</div>
+          <div class="addr"><code id="addr">phack.sh</code><button class="copy tex" data-copy="addr">Copy</button></div>
+        </div>
+        <div class="status" id="status"><span id="players">pinging…</span><span class="bars"><i></i><i></i><i></i><i></i><i></i></span></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>How to join</h2>
+      <ol class="steps">
+        <li class="panel">
+          <div class="slot"><img data-sprite="arrow" alt=""><span class="n">1</span></div>
+          <h3>Open it</h3>
+          <p data-for="windows">Right-click the zip, pick <em>Extract All</em>, then run <code>prismlauncher.exe</code> from the folder.</p>
+          <p data-for="windows" class="heads-up">Windows might say it protected your PC. Click <em>More info</em>, then <em>Run anyway</em>.</p>
+          <p data-for="macos">Open the <code>.dmg</code>, drag the app into Applications and launch it.</p>
+          <p data-for="macos" class="heads-up">macOS blocks it the first time because it isn't signed. Close the warning, open <em>System Settings → Privacy &amp; Security</em>, scroll down and click <em>Open Anyway</em>. Only once.</p>
+          <p data-for="linux">Extract the tarball and run <code>./ph-mc</code> inside it.</p>
+          <p data-for="nixos">Run the command above. First run sets everything up, after that it just launches.</p>
+        </li>
+        <li class="panel">
+          <div class="slot"><img data-sprite="key" alt=""><span class="n">2</span></div>
+          <h3>Sign in</h3>
+          <p>The launcher asks for an account the first time. Use the Microsoft account that owns Minecraft: Java Edition.</p>
+        </li>
+        <li class="panel">
+          <div class="slot"><img data-sprite="pick" alt=""><span class="n">3</span></div>
+          <h3>Press Play</h3>
+          <p>The first launch pulls down all the mods, so give it a few minutes. You'll spawn straight into the server. After that it only grabs what changed.</p>
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Before you ask</h2>
+      <dl class="faq panel">
+        <div>
+          <dt>I don't own Java Edition</dt>
+          <dd>PC Game Pass comes with Java and Bedrock and is the cheapest way to get it.</dd>
+        </div>
+        <div>
+          <dt>My laptop has 8 GB of RAM</dt>
+          <dd>The game takes 5 GB by default. Drop it to 4 GB: right-click the instance in Prism, then <em>Edit → Settings → Java → Maximum memory allocation</em>.</dd>
+        </div>
+        <div>
+          <dt>Can I use my own launcher?</dt>
+          <dd>The address is <code>phack.sh</code>, but you need the exact same mods and versions or the server turns you away. The download handles that for you.</dd>
+        </div>
+        <div>
+          <dt>How does voice chat work?</dt>
+          <dd>Simple Voice Chat is built in. Press <code>V</code> in game to pick your mic. People nearby hear you.</dd>
+        </div>
+      </dl>
+    </section>
+  </main>
+
+  <footer class="tex">
+    <p><span>Made by <a href="https://purduehackers.com">Purdue Hackers</a></span><a id="src" href="#">Source &amp; mod list</a></p>
+  </footer>
+</div>
+
+<script>
+  const REPO = "srgaabriel/ph-mc";
+  const ADDRESS = "phack.sh";
+
+  const latest = file => `https://github.com/${REPO}/releases/latest/download/${file}`;
+  const PLATFORMS = {
+    windows: { label: "for Windows", href: latest("ph-mc-windows.zip") },
+    macos:   { label: "for macOS",   href: latest("ph-mc-macos.dmg") },
+    linux:   { label: "for Linux",   href: latest("ph-mc-linux.tar.gz") },
+    nixos:   { nix: `nix run github:${REPO}` },
+  };
+  const SPLASHES = [
+    "Hack the planet!", "Runs on a 2010 Xeon!", "Now with airships!", "Updates itself!",
+    "Terralith inside!", "Proximity voice chat!", "Bring snacks!", "Don't dig straight down!",
+    "Ask before you nuke!", "Boiler up!", "Built at 3am!",
+  ];
+
+  /* ---------- pixel art ---------- */
+  function rng(seed) {
+    return () => {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  const pick = (r, arr) => arr[Math.floor(r() * arr.length)];
+
+  function canvas(w, h, draw) {
+    const c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    const g = c.getContext("2d");
+    draw((x, y, color) => { g.fillStyle = color; g.fillRect(x, y, 1, 1); });
+    return c.toDataURL();
+  }
+  function sprite(rows, pal) {
+    return canvas(rows[0].length, rows.length, px =>
+      rows.forEach((row, y) => [...row].forEach((ch, x) => pal[ch] && px(x, y, pal[ch]))));
+  }
+  function noise(seed, colors) {
+    const r = rng(seed);
+    return canvas(16, 16, px => { for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) px(x, y, pick(r, colors)); });
+  }
+
+  const DIRT = ["#866043", "#6c4c33", "#79553a", "#9a7050", "#5a3e29", "#866043"];
+  const GREENS = ["#5d9b3a", "#6aab42", "#4e8a30", "#79bb4c", "#5d9b3a"];
+
+  const TEX = {
+    dirt: noise(7, DIRT),
+    stone: noise(11, ["#7a7a7a", "#6e6e6e", "#858585", "#636363", "#7a7a7a", "#747474"]),
+    bedrock: noise(3, ["#2b2b2b", "#555555", "#1a1a1a", "#3d3d3d", "#777777", "#222222"]),
+    grass: (() => {
+      const r = rng(42);
+      const depth = Array.from({ length: 16 }, () => 3 + (r() < .4) + (r() < .2) + (r() < .08));
+      return canvas(16, 16, px => {
+        for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++)
+          px(x, y, y < depth[x] ? pick(r, GREENS) : pick(r, DIRT));
+      });
+    })(),
+  };
+
+  const K = "#1b1b1b";
+  const SPRITES = {
+    grass: TEX.grass,
+    moon: sprite([
+      "aaaaaaaa", "aabaaaaa", "abbaaaba", "aaaaaaaa",
+      "aaaabaaa", "aaabbaaa", "aaaaaaba", "aaaaaaaa",
+    ], { a: "#e9edf6", b: "#c4cbdb" }),
+    arrow: sprite([
+      "....kkkk....", "....kyyk....", "....kyyk....", "....kyok....",
+      "....kyok....", "kkkkkyokkkkk", ".kyyyyyyook.", "..kyyyyook..",
+      "...kyyook...", "....kyok....", ".....kk.....", "............",
+    ], { k: K, y: "#7be05a", o: "#3f9a2a" }),
+    key: sprite([
+      "............", ".kkkk.......", "kyyyyk......", "ky..ykkkkkkk",
+      "ky..yyyyyyok", "kyyyookkokok", ".kkkk..kk.k.", "............",
+    ], { k: K, y: "#ffd84a", o: "#c99a16" }),
+    pick: sprite([
+      "...kkkkkk...", "..kccccccck.", ".kcckkkkcck.", ".kck..kbkck.",
+      ".kk..kbk.kk.", "....kbk.....", "...kbk......", "..kbk.......",
+      ".kbk........", "kbk.........", "kk..........", "............",
+    ], { k: K, c: "#5fe3d6", b: "#8a5a2b" }),
+  };
+  const CLOUDS = [
+    ["....wwwwww......", "..wwwwwwwwww....", "wwwwwwwwwwwwwww.", "wwwwwwwwwwwwwwww", "gggggggggggggggg"],
+    ["......wwww..........", "...wwwwwwwwww.......", ".wwwwwwwwwwwwwwwww..", "wwwwwwwwwwwwwwwwwwww", ".gggggggggggggggggg."],
+    ["..wwwww.....", "wwwwwwwwww..", "wwwwwwwwwwww", "gggggggggggg"],
+  ].map(rows => sprite(rows, { w: "#ffffff", g: "#dfe6f2" }));
+  const FLORA = [
+    sprite([".y.", "yoy", ".y.", ".g.", "gg.", ".g."], { y: "#ffd83a", o: "#e69a10", g: "#3f8a2a" }),
+    sprite([".r.", "rkr", ".r.", ".g.", ".gg", ".g."], { r: "#d8322a", k: "#3a0e0b", g: "#3f8a2a" }),
+    sprite(["g...g", ".g.g.", "g.gg.", ".ggg."], { g: "#4e9a34" }),
+    sprite(["..g..", ".g.g.", "g.g.g", ".ggg."], { g: "#5aa83c" }),
+  ];
+
+  document.querySelectorAll("[data-sprite]").forEach(img => img.src = SPRITES[img.dataset.sprite]);
+  const bg = (sel, url) => document.querySelectorAll(sel).forEach(el => el.style.backgroundImage = `url(${url})`);
+  bg(".mc-btn, .copy", TEX.stone);
+  bg(".ground", TEX.grass);
+  bg(".under", TEX.dirt);
+  bg("footer", TEX.bedrock);
+
+  /* ---------- the sky ---------- */
+  const r = rng(Date.now() % 100000);
+  const clouds = document.getElementById("clouds");
+  for (let i = 0; i < 6; i++) {
+    const img = document.createElement("img");
+    img.className = "cloud"; img.alt = ""; img.src = pick(r, CLOUDS);
+    const scale = 8 + Math.floor(r() * 3) * 2;
+    img.style.width = `${scale * 16}px`;
+    img.style.top = `${4 + r() * 38}%`;
+    const d = 70 + r() * 70;
+    img.style.setProperty("--d", `${d}s`);
+    img.style.setProperty("--delay", `${-r() * d}s`);
+    clouds.append(img);
+  }
+  const stars = document.getElementById("stars");
+  for (let i = 0; i < 70; i++) {
+    const s = document.createElement("i");
+    if (r() < .15) s.className = "big";
+    s.style.left = `${r() * 100}%`;
+    s.style.top = `${r() * 100}%`;
+    s.style.animationDelay = `${-r() * 3}s`;
+    s.style.animationDuration = `${2 + r() * 3}s`;
+    stars.append(s);
+  }
+  const flora = document.getElementById("flora");
+  for (let x = 2 + r() * 4; x < 98; x += 3 + r() * 7) {
+    const img = document.createElement("img");
+    img.alt = ""; img.src = pick(r, FLORA);
+    img.style.left = `${x}%`;
+    img.style.height = `${(img.src === FLORA[2] || img.src === FLORA[3]) ? 16 : 24}px`;
+    img.style.animationDelay = `${-r() * 2.6}s`;
+    flora.append(img);
+  }
+  document.getElementById("splash").textContent = pick(r, SPLASHES);
+
+  /* ---------- platform picker ---------- */
+  function detect() {
+    const p = (navigator.userAgentData?.platform || navigator.platform || "").toLowerCase();
+    const ua = navigator.userAgent.toLowerCase();
+    if (/android|iphone|ipad|ipod/.test(ua) || navigator.userAgentData?.mobile) return { os: "windows", mobile: true };
+    if (p.startsWith("mac") || ua.includes("mac os")) return { os: "macos" };
+    if (p.includes("linux") || ua.includes("x11")) return { os: "linux" };
+    return { os: "windows" };
+  }
+  function show(os) {
+    const p = PLATFORMS[os];
+    const dl = document.getElementById("dl");
+    dl.hidden = !!p.nix;
+    dl.href = p.href || "#";
+    document.getElementById("dl-os").textContent = p.label || "";
+    document.getElementById("nix").hidden = !p.nix;
+    document.getElementById("nix-cmd").textContent = p.nix || "";
+    document.querySelectorAll("[data-for]").forEach(el => el.hidden = el.dataset.for !== os);
+    document.querySelectorAll("[data-os]").forEach(b => b.setAttribute("aria-pressed", b.dataset.os === os));
+  }
+  document.querySelectorAll("[data-os]").forEach(b => b.addEventListener("click", () => show(b.dataset.os)));
+  const { os, mobile } = detect();
+  document.getElementById("mobile").hidden = !mobile;
+  show(os);
+
+  /* ---------- block-break particles on download ---------- */
+  const calm = matchMedia("(prefers-reduced-motion: reduce)");
+  document.getElementById("dl").addEventListener("click", e => {
+    if (calm.matches) return;
+    const box = e.currentTarget.getBoundingClientRect();
+    const colors = [...GREENS, ...DIRT];
+    const parts = Array.from({ length: 22 }, () => {
+      const el = document.createElement("div");
+      el.className = "particle";
+      el.style.background = pick(Math.random, colors);
+      document.body.append(el);
+      return {
+        el, x: box.left + box.width * (.2 + Math.random() * .6), y: box.top + box.height / 2,
+        vx: (Math.random() - .5) * 9, vy: -4 - Math.random() * 7,
+      };
+    });
+    const start = performance.now();
+    (function frame(t) {
+      const done = t - start > 1100;
+      for (const p of parts) {
+        p.vy += .45; p.x += p.vx; p.y += p.vy;
+        p.el.style.transform = `translate(${p.x}px, ${p.y}px)`;
+        if (done) p.el.remove();
+      }
+      if (!done) requestAnimationFrame(frame);
+    })(start);
+  });
+
+  /* ---------- copy buttons ---------- */
+  document.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById(b.dataset.copy).textContent);
+      b.textContent = "Copied!";
+      setTimeout(() => b.textContent = "Copy", 1500);
+    } catch {}
+  }));
+  document.getElementById("src").href = `https://github.com/${REPO}`;
+
+  /* ---------- live server status ---------- */
+  fetch(`https://api.mcsrvstat.us/3/${ADDRESS}`)
+    .then(res => res.json())
+    .then(s => {
+      const status = document.getElementById("status");
+      const players = document.getElementById("players");
+      if (!s.online) {
+        status.classList.add("down");
+        players.textContent = "offline";
+        return;
+      }
+      status.classList.add("up");
+      players.innerHTML = `<b>${s.players?.online ?? 0}</b>/${s.players?.max ?? "?"} online`;
+      const motd = s.motd?.clean?.join(" ").trim();
+      if (motd && motd !== "A Minecraft Server") document.getElementById("motd").textContent = motd;
+    })
+    .catch(() => document.getElementById("players").textContent = "");
+</script>
+</body>
+</html>

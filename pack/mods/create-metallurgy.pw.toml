@@ -1,0 +1,13 @@
+name = "Create: Metallurgy"
+filename = "createmetallurgy-1.0.3-1.21.1.jar"
+side = "both"
+
+[download]
+url = "https://cdn.modrinth.com/data/Soft45xC/versions/4RhIMmaJ/createmetallurgy-1.0.3-1.21.1.jar"
+hash-format = "sha512"
+hash = "e052bddbeb39b68c1482cfe2ebf9919db17d40d71e9f46f96375d82ec876dc0abb4e15b2c14cd1a9e7636d7f80166b2ec336507df7fcc452fd871cc4873ef881"
+
+[update]
+[update.modrinth]
+mod-id = "Soft45xC"
+version = "4RhIMmaJ"
