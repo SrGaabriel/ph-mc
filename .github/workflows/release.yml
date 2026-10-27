@@ -4,10 +4,27 @@ on:
   push:
     tags: ["v*"]
 
-permissions:
-  contents: write
-
 jobs:
+  # The pack URL baked into every launcher: https://srgaabriel.github.io/ph-mc/pack.toml
+  pack:
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}pack.toml
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: pack
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
   linux:
     runs-on: ubuntu-latest
     steps:
@@ -17,7 +34,7 @@ jobs:
         with:
           path: build/cache
           key: downloads-${{ hashFiles('launcher/SHA256SUMS') }}
-      - run: nix develop --command just package-windows package-linux build-site
+      - run: nix develop --command just package-windows package-linux
       - uses: actions/upload-artifact@v4
         with:
           name: dist-linux
@@ -39,8 +56,10 @@ jobs:
           path: build/dist/*
 
   release:
-    needs: [linux, macos]
+    needs: [pack, linux, macos]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:

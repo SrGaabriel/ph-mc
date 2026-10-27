@@ -88,14 +88,7 @@ package-macos: template
       echo "No hdiutil: built $app only. The .dmg is made on macOS (CI)."
     fi
 
-# Site + pack, ready to upload to minecraft.phack.sh (also archived as ph-mc-site.tar.gz)
-build-site:
-    rm -rf build/site && mkdir -p build/site {{dist}}
-    cp -R site/. build/site/
-    cp -R pack build/site/pack
-    tar czf {{dist}}/ph-mc-site.tar.gz -C build/site .
-
-# Bump the pack version, commit, and tag. Pushing the tag starts the release build.
+# Bump the pack version, commit, and tag. Pushing the tag builds the downloads and publishes the pack to GitHub Pages.
 release version:
     git diff --quiet && git diff --cached --quiet || { echo "Commit or stash your changes first."; exit 1; }
     sed -i.bak 's/^version = .*/version = "{{version}}"/' pack/pack.toml && rm pack/pack.toml.bak
