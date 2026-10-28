@@ -94,7 +94,7 @@
   }
   @keyframes splash { to { transform: rotate(-16deg) scale(1.09); } }
   .tagline {
-    margin: 40px 0 0; max-width: 540px;
+    margin: 40px 0 0; max-width: 640px;
     color: #fff; font-size: 18px; font-weight: 500;
     text-shadow: 2px 2px 0 var(--shadow), 0 0 12px rgba(30, 50, 110, .45);
   }
@@ -248,12 +248,12 @@
   </div>
 
   <div class="hero">
-    <p class="kicker">Minecraft server</p>
+    <p class="kicker">Minecraft modpack</p>
     <div class="title-wrap">
       <h1>Purdue<br>Hackers</h1>
       <span class="splash" id="splash">Hack the planet!</span>
     </div>
-    <p class="tagline">Modded 1.21.1 with Create (airships included), Ars Nouveau, Iron's Spells, Terralith and proximity voice chat. Download it, sign in once, hit Play. It keeps itself up to date.</p>
+    <p class="tagline">Modded 1.21.1 server heavily focused on Create mod with bits of magic.</p>
 
     <div class="download">
       <a class="mc-btn tex" id="dl" href="#"><img data-sprite="grass" alt="">Download <span id="dl-os"></span></a>
@@ -298,19 +298,19 @@
           <p data-for="windows">Right-click the zip, pick <em>Extract All</em>, then run <code>freesmlauncher.exe</code> from the folder.</p>
           <p data-for="windows" class="heads-up">Windows might say it protected your PC. Click <em>More info</em>, then <em>Run anyway</em>.</p>
           <p data-for="macos">Open the <code>.dmg</code>, drag the app into Applications and launch it.</p>
-          <p data-for="macos" class="heads-up">macOS blocks it the first time because it isn't signed. Close the warning, open <em>System Settings → Privacy &amp; Security</em>, scroll down and click <em>Open Anyway</em>. Only once.</p>
+          <p data-for="macos" class="heads-up">macOS blocks it the first time because it isn't signed. Close the warning, open <em>System Settings → Privacy &amp; Security</em>, scroll down and click <em>Open Anyway</em> once.</p>
           <p data-for="linux">Extract the tarball and run <code>./ph-mc</code> inside it.</p>
           <p data-for="nixos">Run the command above. First run sets everything up, after that it just launches.</p>
         </li>
         <li class="panel">
           <div class="slot"><img data-sprite="key" alt=""><span class="n">2</span></div>
           <h3>Sign in</h3>
-          <p>The launcher asks for an account the first time. Use the Microsoft account that owns Minecraft: Java Edition.</p>
+          <p>The launcher asks for an account the first time, you can sign in with your Microsoft account that owns <code>Minecraft: Java Edition</code>. Alternatively, you can choose <code>Offline Mode</code> and join the server, but for legal reasons™, we <b>strongly</b> advise against it.</p>
         </li>
         <li class="panel">
           <div class="slot"><img data-sprite="pick" alt=""><span class="n">3</span></div>
           <h3>Press Play</h3>
-          <p>The first launch pulls down all the mods, so give it a few minutes. You'll spawn straight into the server. After that it only grabs what changed.</p>
+          <p>The first launch pulls down all the mods, so give it a few minutes.</p>
         </li>
       </ol>
     </section>
@@ -320,19 +320,19 @@
       <dl class="faq panel">
         <div>
           <dt>I don't own Java Edition</dt>
-          <dd>PC Game Pass comes with Java and Bedrock and is the cheapest way to get it.</dd>
+          <dd>You can press Offline Mode in the launcher and choose any nickname you want, and your data will be saved under that nickname.</dd>
         </div>
         <div>
-          <dt>My laptop has 8 GB of RAM</dt>
-          <dd>The game takes 5 GB by default. Drop it to 4 GB: right-click the instance in Freesm Launcher, then <em>Edit → Settings → Java → Maximum memory allocation</em>.</dd>
+          <dt>My laptop is a potato</dt>
+          <dd>You can play the game with only 4GB of RAM allocated! Right-click the instance in Freesm Launcher, then <em>Edit → Settings → Java → Maximum memory allocation</em>.</dd>
         </div>
         <div>
           <dt>Can I use my own launcher?</dt>
-          <dd>The address is <code>phack.sh</code>, but you need the exact same mods and versions or the server turns you away. The download handles that for you.</dd>
+          <dd>Yes, the address is <code>phack.sh</code>, but you need the exact same mods and versions or the server turns you away.</dd>
         </div>
         <div>
           <dt>How does voice chat work?</dt>
-          <dd>Simple Voice Chat is built in. Press <code>V</code> in game to pick your mic. People nearby hear you.</dd>
+          <dd>Press <code>V</code> in game to pick your mic and people nearby will hear you.</dd>
         </div>
       </dl>
     </section>
@@ -355,9 +355,7 @@
     nixos:   { nix: `nix run github:${REPO}` },
   };
   const SPLASHES = [
-    "Hack the planet!", "Runs on a 2010 Xeon!", "Now with airships!", "Updates itself!",
-    "Terralith inside!", "Proximity voice chat!", "Bring snacks!", "Don't dig straight down!",
-    "Ask before you nuke!", "Boiler up!", "Built at 3am!",
+    "Before you leave!",
   ];
 
   /* ---------- pixel art ---------- */
