@@ -27,8 +27,8 @@ jobs:
       # --checksum because a fresh checkout gives every file a new mtime. No --delete: packwiz only fetches what index.toml lists.
       - name: Upload
         run: |
-          rsync -rlvz --checksum --chmod=D755,F644 -e "ssh -p 10022" site/ gabriel@server.purduehackers.com:
-          rsync -rlvz --checksum --chmod=D755,F644 -e "ssh -p 10022" pack/ gabriel@server.purduehackers.com:pack/
+          rsync -rlvz --checksum --chmod=D755,F644 -e "ssh -p 10022" site/ p-minecraft@server.purduehackers.com:
+          rsync -rlvz --checksum --chmod=D755,F644 -e "ssh -p 10022" pack/ p-minecraft@server.purduehackers.com:pack/
 
   linux:
     if: github.event_name == 'push'

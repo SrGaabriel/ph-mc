@@ -100,7 +100,7 @@ release version:
     git diff --quiet && git diff --cached --quiet || { echo "Commit or stash your changes first."; exit 1; }
     sed -i.bak 's/^version = .*/version = "{{version}}"/' pack/pack.toml && rm pack/pack.toml.bak
     cd pack && packwiz refresh
-    git commit -am "Release {{version}}"
+    git commit -am "chore: release v{{version}}"
     git tag "v{{version}}"
     @echo "Tagged v{{version}}. Push with: git push --follow-tags"
 
