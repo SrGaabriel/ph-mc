@@ -1,0 +1,13 @@
+name = "Boss Bars Reforged"
+filename = "Boss Bars Reforged v1.2.zip"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/uGOo9pIY/versions/4mjgmRSC/Boss%20Bars%20Reforged%20v1.2.zip"
+hash-format = "sha512"
+hash = "a39f8dfade2593757bb067f4bf8557dbaab78aa1bc616552052a9425c692885db5b399dbbca152535b376e2d5c668369d8e4a804e8dbd26cda1ba17d2bd7a33f"
+
+[update]
+[update.modrinth]
+mod-id = "uGOo9pIY"
+version = "4mjgmRSC"

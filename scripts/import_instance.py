@@ -1,8 +1,12 @@
 """Generate packwiz .pw.toml metafiles from the Prism instance and server staging jars.
 
-Jars are resolved on Modrinth by SHA-1. Sides come from the lists in CLAUDE.md.
+Jars are resolved on Modrinth by SHA-1. Sides come from the CLIENT_ONLY / SERVER_ONLY lists.
 Jars not on Modrinth are copied into pack/mods for `packwiz curseforge detect` to resolve.
 Usage: python3 scripts/import_instance.py <client-mods-dir> <server-mods-dir> <pack-dir> [--check]
+
+--paxi replaces Paxi resource/data pack zips under <pack-dir>/config/paxi with Modrinth
+metafiles, so we link to them instead of hosting other people's work. Zips not on Modrinth stay.
+Usage: python3 scripts/import_instance.py --paxi <pack-dir>
 """
 
 import hashlib
@@ -60,7 +64,58 @@ def toml_str(s):
     return json.dumps(s, ensure_ascii=False)
 
 
+def lookup(sha1s):
+    """sha1 -> Modrinth version, and project id -> project, for the hashes Modrinth knows."""
+    versions = api("/version_files", {"hashes": list(sha1s), "algorithm": "sha1"})
+    project_ids = sorted({v["project_id"] for v in versions.values()})
+    projects = {
+        p["id"]: p
+        for p in api("/projects?ids=" + urllib.parse.quote(json.dumps(project_ids)))
+    } if project_ids else {}
+    return versions, projects
+
+
+def write_meta(path, title, filename, side, version, h):
+    f = next(f for f in version["files"] if f["hashes"]["sha1"] == h)
+    path.write_text(
+        f"name = {toml_str(title)}\n"
+        f"filename = {toml_str(filename)}\n"
+        f"side = {toml_str(side)}\n\n"
+        "[download]\n"
+        f"url = {toml_str(f['url'])}\n"
+        'hash-format = "sha512"\n'
+        f"hash = {toml_str(f['hashes']['sha512'])}\n\n"
+        "[update]\n[update.modrinth]\n"
+        f"mod-id = {toml_str(version['project_id'])}\n"
+        f"version = {toml_str(version['id'])}\n",
+        encoding="utf-8",
+    )
+    return f
+
+
+def link_paxi(pack):
+    zips = sorted((pack / "config" / "paxi").glob("*/*.zip"))
+    sha1 = {z: hashlib.sha1(z.read_bytes()).hexdigest() for z in zips}
+    if not sha1:
+        return 0
+    versions, projects = lookup(sha1.values())
+    for z, h in sha1.items():
+        v = versions.get(h)
+        if not v:
+            print("  NOT ON MODRINTH, still bundled:", z)
+            continue
+        proj = projects[v["project_id"]]
+        # Keep the local filename: Paxi's load order lists packs by name
+        side = "client" if z.parent.name == "resourcepacks" else "both"
+        write_meta(z.parent / f"{proj['slug']}.pw.toml", proj["title"], z.name, side, v, h)
+        z.unlink()
+    print(f"{len(zips)} Paxi zips, {sum(h in versions for h in sha1.values())} linked to Modrinth")
+    return 0
+
+
 def main():
+    if sys.argv[1] == "--paxi":
+        return link_paxi(pathlib.Path(sys.argv[2]))
     client, server, pack = (pathlib.Path(a) for a in sys.argv[1:4])
     check = "--check" in sys.argv
     jars = {p.name: p for p in sorted(client.glob("*.jar"))}
@@ -69,16 +124,8 @@ def main():
             jars.setdefault(p.name, p)
 
     sha1 = {name: hashlib.sha1(p.read_bytes()).hexdigest() for name, p in jars.items()}
-    versions = api(
-        "/version_files", {"hashes": list(sha1.values()), "algorithm": "sha1"}
-    )
+    versions, projects = lookup(sha1.values())
     missing = [n for n, h in sha1.items() if h not in versions]
-
-    project_ids = sorted({v["project_id"] for v in versions.values()})
-    projects = {
-        p["id"]: p
-        for p in api("/projects?ids=" + urllib.parse.quote(json.dumps(project_ids)))
-    }
 
     print(f"{len(jars)} jars, {len(versions)} resolved, {len(missing)} missing")
     for n in missing:
@@ -97,19 +144,7 @@ def main():
             continue
         f = next(f for f in v["files"] if f["hashes"]["sha1"] == h)
         proj = projects[v["project_id"]]
-        (out / f"{proj['slug']}.pw.toml").write_text(
-            f"name = {toml_str(proj['title'])}\n"
-            f"filename = {toml_str(f['filename'])}\n"
-            f"side = {toml_str(side_of(name))}\n\n"
-            "[download]\n"
-            f"url = {toml_str(f['url'])}\n"
-            'hash-format = "sha512"\n'
-            f"hash = {toml_str(f['hashes']['sha512'])}\n\n"
-            "[update]\n[update.modrinth]\n"
-            f"mod-id = {toml_str(v['project_id'])}\n"
-            f"version = {toml_str(v['id'])}\n",
-            encoding="utf-8",
-        )
+        write_meta(out / f"{proj['slug']}.pw.toml", proj["title"], f["filename"], side_of(name), v, h)
     return 0
 
 

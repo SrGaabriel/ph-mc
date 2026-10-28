@@ -1,0 +1,13 @@
+name = "Dark Coffee GUI - Extras"
+filename = "CoffeeGUI_JustTheHotbar_v03.zip"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/Q1JrQJtu/versions/V7Pk1fp4/CoffeeGUI_JustTheHotbar_v03.zip"
+hash-format = "sha512"
+hash = "34a9030e7173f79379fd7045fcd3c0077f3412dd122d266769119522e09b06b6183de4a42a55aa2cbe21c4b5e27a8c2fdc943751b51ae50a78277cb60f61c856"
+
+[update]
+[update.modrinth]
+mod-id = "Q1JrQJtu"
+version = "V7Pk1fp4"

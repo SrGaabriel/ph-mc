@@ -1,0 +1,13 @@
+name = "Aures - Medieval Style Lootr"
+filename = "Medieval_Style_Lootr.zip"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/AJQBwNIi/versions/N7HOAO7o/Medieval_Style_Lootr.zip"
+hash-format = "sha512"
+hash = "e0395d68b6be8899969f1e9ec818089d60c74c2a23040217fb978adf2158f41813dc21d75c94b6b8ea7e31cb3c6a959688932980b29daeb6da685d33daa4c3d6"
+
+[update]
+[update.modrinth]
+mod-id = "AJQBwNIi"
+version = "N7HOAO7o"

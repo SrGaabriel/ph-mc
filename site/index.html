@@ -131,7 +131,7 @@
   }
   .cmd code { overflow-x: auto; white-space: nowrap; }
   .cmd code::before { content: "$ "; color: #7cd37c; }
-  .cmd.win code::before { content: none; }
+  .cmd.plain code::before { content: none; }
   .hint { margin: 0; font-family: var(--pixel); font-size: 16px; color: #fff; text-shadow: 2px 2px 0 var(--shadow); }
 
   .copy {
@@ -271,6 +271,7 @@
         <button data-os="macos">macOS</button>
         <button data-os="linux">Linux</button>
         <button data-os="nixos">NixOS</button>
+        <button data-os="other">Other launcher</button>
       </p>    </div>
   </div>
 
@@ -306,16 +307,18 @@
           <p data-for="linux">Extract the tarball and run <code>./ph-mc</code> inside it.</p>
           <p data-for="linux">Or paste the command into a terminal instead: you get an app menu entry and a <code>ph-mc</code> command.</p>
           <p data-for="nixos">Run the command above. First run sets everything up, after that it just launches.</p>
+          <p data-for="other">In Prism Launcher (or MultiMC, Freesm and friends) click <em>Add Instance → Import</em> and pick the zip, or paste its link. The instance pulls the mods from our pack every time it starts, so it stays up to date.</p>
+          <p data-for="other" class="heads-up">The CurseForge and Modrinth apps can't use our pack. Grab Prism Launcher or use the download for your OS.</p>
         </li>
         <li class="panel">
           <div class="slot"><img data-sprite="key" alt=""><span class="n">2</span></div>
           <h3>Sign in</h3>
-          <p>The launcher asks for an account the first time, you can sign in with your Microsoft account that owns <code>Minecraft: Java Edition</code>. Alternatively, you can choose <code>Offline Mode</code> and join the server, but for legal reasons™, we <b>strongly</b> advise against it.</p>
+          <p>The launcher asks for an account the first time, you can sign in with your Microsoft account that owns <code>Minecraft: Java Edition</code>. Alternatively, you can choose <code>Offline Mode</code> and join the server, but for legal reasons we have to advise against it.</p>
         </li>
         <li class="panel">
           <div class="slot"><img data-sprite="pick" alt=""><span class="n">3</span></div>
           <h3>Play</h3>
-          <p>It goes straight into the game and joins the server<span data-for="windows"> (from the zip, press Play in the launcher first)</span>. The first launch pulls down all the mods, so give it a few minutes.</p>
+          <p><span data-for="windows macos linux nixos">It goes straight into the game and joins the server<span data-for="windows"> (from the zip, press Play in the launcher first)</span>.</span><span data-for="other">Press Play on the instance and it joins the server by itself.</span> The first launch pulls down all the mods, so give it a few minutes.</p>
         </li>
       </ol>
     </section>
@@ -325,17 +328,17 @@
       <dl class="faq panel">
         <div>
           <dt>I don't own Java Edition</dt>
-          <dd>You can press Offline Mode in the launcher and choose any nickname you want, and your data will be saved under that nickname.</dd>
+          <dd>The server doesn't check accounts, so Offline Mode would technically get you in, but for legal reasons we have to advise against it.</dd>
         </div>
         <div>
           <dt>My laptop is a potato</dt>
           <dd>You can play the game with only 4GB of RAM allocated! Open the launcher window
-            (<span data-for="windows"><em>Purdue Hackers Launcher</em> in the Start menu</span><span data-for="macos">hold <code>Option</code> while you open the app</span><span data-for="linux">right-click the app menu entry and pick <em>Open the launcher</em>, or run <code>ph-mc --launcher</code></span><span data-for="nixos"><code>nix run github:srgaabriel/ph-mc -- --launcher</code></span>),
+            (<span data-for="windows"><em>Purdue Hackers Launcher</em> in the Start menu</span><span data-for="macos">hold <code>Option</code> while you open the app</span><span data-for="linux">right-click the app menu entry and pick <em>Open the launcher</em>, or run <code>ph-mc --launcher</code></span><span data-for="nixos"><code>nix run github:srgaabriel/ph-mc -- --launcher</code></span><span data-for="other">the one you imported it into</span>),
             right-click the instance, then <em>Edit → Settings → Java → Maximum memory allocation</em>.</dd>
         </div>
         <div>
           <dt>Can I use my own launcher?</dt>
-          <dd>Yes, the address is <code>phack.sh</code>, but you need the exact same mods and versions or the server turns you away.</dd>
+          <dd>Yes, pick <em>Other launcher</em> at the top for an instance you can import. If you set it up yourself, the address is <code>phack.sh</code>, but you need the exact same mods and versions or the server turns you away.</dd>
         </div>
         <div>
           <dt>How does voice chat work?</dt>
@@ -358,10 +361,11 @@
 
   const latest = file => `https://github.com/${REPO}/releases/latest/download/${file}`;
   const PLATFORMS = {
-    windows: { label: "for Windows", href: latest("ph-mc-windows.zip"), cmd: `powershell -c "irm ${SITE}/install.ps1 | iex"`, win: true },
+    windows: { label: "for Windows", href: latest("ph-mc-windows.zip"), cmd: `powershell -c "irm ${SITE}/install.ps1 | iex"`, plain: true },
     macos:   { label: "for macOS",   href: latest("ph-mc-macos.dmg"),   cmd: `curl -fsSL ${SITE}/install.sh | sh` },
     linux:   { label: "for Linux",   href: latest("ph-mc-linux.tar.gz"), cmd: `curl -fsSL ${SITE}/install.sh | sh` },
     nixos:   { cmd: `nix run github:${REPO}` },
+    other:   { label: "the instance", href: latest("ph-mc-instance.zip"), cmd: `${SITE}/pack/pack.toml`, plain: true, or: "or point packwiz at" },
   };
   const SPLASHES = [
     "Before you leave!",
@@ -502,10 +506,12 @@
     dl.hidden = !p.href;
     dl.href = p.href || "#";
     document.getElementById("dl-os").textContent = p.label || "";
-    document.getElementById("or").hidden = !p.href;
-    document.getElementById("cmd").classList.toggle("win", !!p.win);
+    const or = document.getElementById("or");
+    or.hidden = !p.href;
+    or.textContent = p.or || "or run";
+    document.getElementById("cmd").classList.toggle("plain", !!p.plain);
     document.getElementById("cmd-text").textContent = p.cmd;
-    document.querySelectorAll("[data-for]").forEach(el => el.hidden = el.dataset.for !== os);
+    document.querySelectorAll("[data-for]").forEach(el => el.hidden = !el.dataset.for.split(" ").includes(os));
     document.querySelectorAll("[data-os]").forEach(b => b.setAttribute("aria-pressed", b.dataset.os === os));
   }
   document.querySelectorAll("[data-os]").forEach(b => b.addEventListener("click", () => show(b.dataset.os)));

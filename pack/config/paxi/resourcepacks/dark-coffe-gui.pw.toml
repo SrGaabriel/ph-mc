@@ -1,0 +1,13 @@
+name = "Dark Coffee GUI"
+filename = "CoffeeGUI_1.20.2-26.3_release_v2.2.3.zip"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/KhALBWoN/versions/HpbIP3hm/CoffeeGUI_1.20.2-26.3_release_v2.2.3.zip"
+hash-format = "sha512"
+hash = "743776a34864c7f112c54de5b52a4f3981d7352a27a31ca6a167838fb0dc60cc7bcccc2ac5261e75762c3b5dea11f31fa25f0c77c0e98b6667f8de067f5499cd"
+
+[update]
+[update.modrinth]
+mod-id = "KhALBWoN"
+version = "HpbIP3hm"

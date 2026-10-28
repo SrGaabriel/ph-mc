@@ -1,0 +1,13 @@
+name = "🔑 Better Keys 🗝"
+filename = "BetterKeys.zip"
+side = "client"
+
+[download]
+url = "https://cdn.modrinth.com/data/abNIJeRC/versions/jq8PBpis/BetterKeys.zip"
+hash-format = "sha512"
+hash = "607373d0760970a746ba32846ca7bfe80a2b63b94329c0e893c896a184ebbf3faac889140a5a69719d037b158b09af181f24519b3845a038e3d982dda97a0f50"
+
+[update]
+[update.modrinth]
+mod-id = "abNIJeRC"
+version = "jq8PBpis"

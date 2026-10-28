@@ -40,7 +40,7 @@ jobs:
         with:
           path: build/cache
           key: downloads-${{ hashFiles('launcher/SHA256SUMS') }}
-      - run: nix develop --command just package-windows package-linux
+      - run: nix develop --command just package-windows package-linux package-instance
       - uses: actions/upload-artifact@v4
         with:
           name: dist-linux

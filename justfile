@@ -16,6 +16,7 @@ import-instance:
     rsync -a --delete --exclude-from=scripts/config-excludes.txt \
       --include='config/***' --include='defaultconfigs/***' --include='kubejs/***' --exclude='*' \
       "{{instance}}/" pack/
+    python3 -I scripts/import_instance.py --paxi pack
     cd pack && packwiz curseforge detect && packwiz refresh
 
 # Rebuild pack/index.toml after editing files in pack/
@@ -63,6 +64,12 @@ package-linux: template
     cp -R build/template build/linux/ph-mc/template
     cp launcher/run.sh launcher/linux/ph-mc build/linux/ph-mc/
     tar czf {{dist}}/ph-mc-linux.tar.gz -C build/linux ph-mc
+
+# Just the instance, for people who already have Prism, MultiMC or Freesm (Add Instance → Import)
+package-instance: template
+    mkdir -p {{dist}}
+    rm -f {{dist}}/ph-mc-instance.zip
+    cd build/template/instances && zip -qr ../../../{{dist}}/ph-mc-instance.zip "Purdue Hackers"
 
 # Wrapper .app around Freesm Launcher.app; the .dmg step needs macOS (hdiutil)
 package-macos: template
