@@ -6,4 +6,10 @@ xattr -dr com.apple.quarantine "$res/Freesm Launcher.app" 2>/dev/null || true
 export PH_LAUNCHER="$res/Freesm Launcher.app/Contents/MacOS/freesmlauncher"
 export PH_TEMPLATE="$res/template"
 export PH_DATA="$HOME/Library/Application Support/PurdueHackersMinecraft"
+
+case "${1:-}" in -psn_*) shift ;; esac
+# Opening the app goes straight into the game. Holding Option while opening it shows the launcher window instead.
+if [ "$#" -eq 0 ] && [ -n "$(osascript -l JavaScript -e 'ObjC.import("AppKit"); ($.NSEvent.modifierFlags & 524288) ? "1" : ""' 2>/dev/null)" ]; then
+  set -- --launcher
+fi
 exec bash "$res/run.sh" "$@"

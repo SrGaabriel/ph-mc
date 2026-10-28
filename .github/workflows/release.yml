@@ -4,31 +4,8 @@ on:
   push:
     tags: ["v*"]
 
+# The pack itself is served from https://minecraft.phack.sh/pack/ and uploaded by hand (deploy-site.nu)
 jobs:
-  # The pack URL baked into every launcher: https://srgaabriel.github.io/ph-mc/pack.toml
-  pack:
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy.outputs.page_url }}pack.toml
-    concurrency:
-      group: pages
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v4
-      # One artifact per attempt: deploy-pages fails on a re-run if two share a name
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: pack
-          name: github-pages-${{ github.run_attempt }}
-      - id: deploy
-        uses: actions/deploy-pages@v4
-        with:
-          artifact_name: github-pages-${{ github.run_attempt }}
-
   linux:
     runs-on: ubuntu-latest
     steps:
@@ -60,7 +37,7 @@ jobs:
           path: build/dist/*
 
   release:
-    needs: [pack, linux, macos]
+    needs: [linux, macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write

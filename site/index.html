@@ -131,6 +131,8 @@
   }
   .cmd code { overflow-x: auto; white-space: nowrap; }
   .cmd code::before { content: "$ "; color: #7cd37c; }
+  .cmd.win code::before { content: none; }
+  .hint { margin: 0; font-family: var(--pixel); font-size: 16px; color: #fff; text-shadow: 2px 2px 0 var(--shadow); }
 
   .copy {
     flex: none; font-family: var(--pixel); font-size: 15px; color: #fff; text-shadow: 2px 2px 0 #383838;
@@ -257,9 +259,10 @@
 
     <div class="download">
       <a class="mc-btn tex" id="dl" href="#"><img data-sprite="grass" alt="">Download <span id="dl-os"></span></a>
-      <div class="cmd" id="nix" hidden>
-        <code id="nix-cmd"></code>
-        <button class="copy tex" data-copy="nix-cmd">Copy</button>
+      <p class="hint" id="or">or run</p>
+      <div class="cmd" id="cmd">
+        <code id="cmd-text"></code>
+        <button class="copy tex" data-copy="cmd-text">Copy</button>
       </div>
       <p class="mobile-note" id="mobile" hidden>This runs on computers, so open this page on your laptop.</p>
       <p class="others">
@@ -268,8 +271,7 @@
         <button data-os="macos">macOS</button>
         <button data-os="linux">Linux</button>
         <button data-os="nixos">NixOS</button>
-      </p>
-    </div>
+      </p>    </div>
   </div>
 
   <div class="ground tex" aria-hidden="true"><div class="flora" id="flora"></div></div>
@@ -297,9 +299,12 @@
           <h3>Open it</h3>
           <p data-for="windows">Right-click the zip, pick <em>Extract All</em>, then run <code>freesmlauncher.exe</code> from the folder.</p>
           <p data-for="windows" class="heads-up">Windows might say it protected your PC. Click <em>More info</em>, then <em>Run anyway</em>.</p>
+          <p data-for="windows">Or press <code>Win</code> + <code>R</code> and paste the command instead: no warning, and you get Start menu and desktop shortcuts.</p>
           <p data-for="macos">Open the <code>.dmg</code>, drag the app into Applications and launch it.</p>
           <p data-for="macos" class="heads-up">macOS blocks it the first time because it isn't signed. Close the warning, open <em>System Settings → Privacy &amp; Security</em>, scroll down and click <em>Open Anyway</em> once.</p>
+          <p data-for="macos">Or paste the command into Terminal instead and skip the warning.</p>
           <p data-for="linux">Extract the tarball and run <code>./ph-mc</code> inside it.</p>
+          <p data-for="linux">Or paste the command into a terminal instead: you get an app menu entry and a <code>ph-mc</code> command.</p>
           <p data-for="nixos">Run the command above. First run sets everything up, after that it just launches.</p>
         </li>
         <li class="panel">
@@ -309,8 +314,8 @@
         </li>
         <li class="panel">
           <div class="slot"><img data-sprite="pick" alt=""><span class="n">3</span></div>
-          <h3>Press Play</h3>
-          <p>The first launch pulls down all the mods, so give it a few minutes.</p>
+          <h3>Play</h3>
+          <p>It goes straight into the game and joins the server<span data-for="windows"> (from the zip, press Play in the launcher first)</span>. The first launch pulls down all the mods, so give it a few minutes.</p>
         </li>
       </ol>
     </section>
@@ -324,7 +329,9 @@
         </div>
         <div>
           <dt>My laptop is a potato</dt>
-          <dd>You can play the game with only 4GB of RAM allocated! Right-click the instance in Freesm Launcher, then <em>Edit → Settings → Java → Maximum memory allocation</em>.</dd>
+          <dd>You can play the game with only 4GB of RAM allocated! Open the launcher window
+            (<span data-for="windows"><em>Purdue Hackers Launcher</em> in the Start menu</span><span data-for="macos">hold <code>Option</code> while you open the app</span><span data-for="linux">right-click the app menu entry and pick <em>Open the launcher</em>, or run <code>ph-mc --launcher</code></span><span data-for="nixos"><code>nix run github:srgaabriel/ph-mc -- --launcher</code></span>),
+            right-click the instance, then <em>Edit → Settings → Java → Maximum memory allocation</em>.</dd>
         </div>
         <div>
           <dt>Can I use my own launcher?</dt>
@@ -347,12 +354,14 @@
   const REPO = "srgaabriel/ph-mc";
   const ADDRESS = "phack.sh";
 
+  const SITE = "https://minecraft.phack.sh";
+
   const latest = file => `https://github.com/${REPO}/releases/latest/download/${file}`;
   const PLATFORMS = {
-    windows: { label: "for Windows", href: latest("ph-mc-windows.zip") },
-    macos:   { label: "for macOS",   href: latest("ph-mc-macos.dmg") },
-    linux:   { label: "for Linux",   href: latest("ph-mc-linux.tar.gz") },
-    nixos:   { nix: `nix run github:${REPO}` },
+    windows: { label: "for Windows", href: latest("ph-mc-windows.zip"), cmd: `powershell -c "irm ${SITE}/install.ps1 | iex"`, win: true },
+    macos:   { label: "for macOS",   href: latest("ph-mc-macos.dmg"),   cmd: `curl -fsSL ${SITE}/install.sh | sh` },
+    linux:   { label: "for Linux",   href: latest("ph-mc-linux.tar.gz"), cmd: `curl -fsSL ${SITE}/install.sh | sh` },
+    nixos:   { cmd: `nix run github:${REPO}` },
   };
   const SPLASHES = [
     "Before you leave!",
@@ -490,11 +499,12 @@
   function show(os) {
     const p = PLATFORMS[os];
     const dl = document.getElementById("dl");
-    dl.hidden = !!p.nix;
+    dl.hidden = !p.href;
     dl.href = p.href || "#";
     document.getElementById("dl-os").textContent = p.label || "";
-    document.getElementById("nix").hidden = !p.nix;
-    document.getElementById("nix-cmd").textContent = p.nix || "";
+    document.getElementById("or").hidden = !p.href;
+    document.getElementById("cmd").classList.toggle("win", !!p.win);
+    document.getElementById("cmd-text").textContent = p.cmd;
     document.querySelectorAll("[data-for]").forEach(el => el.hidden = el.dataset.for !== os);
     document.querySelectorAll("[data-os]").forEach(b => b.setAttribute("aria-pressed", b.dataset.os === os));
   }

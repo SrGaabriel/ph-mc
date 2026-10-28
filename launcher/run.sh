@@ -5,6 +5,7 @@
 #   PH_DATA      per-user data dir
 #   PH_JAVA      optional: pin this Java instead of the launcher's auto-download (NixOS can't run downloaded JREs)
 #   PH_PACK_URL  optional: install from this pack.toml instead (testing; persists in this data dir)
+# Usage: run.sh [--launcher | launcher args...]
 set -euo pipefail
 
 inst="$PH_DATA/instances/Purdue Hackers"
@@ -49,6 +50,14 @@ fi
 if [ -n "${PH_PACK_URL:-}" ]; then
   # Same quoting the launcher writes: "\"$INST_JAVA\" -jar ..."
   set_key "$inst/instance.cfg" PreLaunchCommand "\"\\\"\$INST_JAVA\\\" -jar packwiz-installer-bootstrap.jar $PH_PACK_URL\""
+fi
+
+# No arguments: straight into the game, which joins the server by itself (JoinServerOnLaunch).
+# --launcher opens the launcher window instead, for settings and the like.
+if [ "${1:-}" = "--launcher" ]; then
+  shift
+elif [ "$#" -eq 0 ]; then
+  set -- --launch "Purdue Hackers"
 fi
 
 exec "$PH_LAUNCHER" --dir "$PH_DATA" "$@"
