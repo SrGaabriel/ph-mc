@@ -3,10 +3,35 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  # Manual run: deploy the site and pack only, no downloads or GitHub release
+  workflow_dispatch:
 
-# The pack itself is served from https://minecraft.phack.sh/pack/ and uploaded by hand (deploy-site.nu)
 jobs:
+  # site/ to the web root and pack/ to /pack. Launchers install from https://minecraft.phack.sh/pack/pack.toml.
+  # DEPLOY_SSH_KEY is only allowed to run rrsync inside /proj/minecraft/www, so paths here are relative to it.
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo '[server.purduehackers.com]:10022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINtORTZzH/Xcj9+fbEN3zzu2fueGkYn9FSwDk0KPHjii' > ~/.ssh/known_hosts
+      # --checksum because a fresh checkout gives every file a new mtime. No --delete: packwiz only fetches what index.toml lists.
+      - name: Upload
+        run: |
+          rsync -rlvz --checksum --chmod=D755,F644 -e "ssh -p 10022" site/ gabriel@server.purduehackers.com:
+          rsync -rlvz --checksum --chmod=D755,F644 -e "ssh -p 10022" pack/ gabriel@server.purduehackers.com:pack/
+
   linux:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,6 +47,7 @@ jobs:
           path: build/dist/*
 
   macos:
+    if: github.event_name == 'push'
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,8 +62,9 @@ jobs:
           name: dist-macos
           path: build/dist/*
 
+  # Waits on deploy so new downloads never point at a pack that isn't up yet
   release:
-    needs: [linux, macos]
+    needs: [deploy, linux, macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -88,7 +88,7 @@ package-macos: template
       echo "No hdiutil: built $app only. The .dmg is made on macOS (CI)."
     fi
 
-# Bump the pack version, commit, and tag. Pushing the tag builds the downloads; upload pack/ to the site to ship it.
+# Bump the pack version, commit, and tag. Pushing the tag deploys the site and pack, then builds the downloads.
 release version:
     git diff --quiet && git diff --cached --quiet || { echo "Commit or stash your changes first."; exit 1; }
     sed -i.bak 's/^version = .*/version = "{{version}}"/' pack/pack.toml && rm pack/pack.toml.bak
