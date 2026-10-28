@@ -24,11 +24,10 @@ jobs:
           printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           echo '[server.purduehackers.com]:10022 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINtORTZzH/Xcj9+fbEN3zzu2fueGkYn9FSwDk0KPHjii' > ~/.ssh/known_hosts
-      # --checksum because a fresh checkout gives every file a new mtime. No --delete: packwiz only fetches what index.toml lists.
       - name: Upload
         run: |
-          rsync -rlvz --checksum --chmod=D755,F644 -e "ssh -p 10022" site/ p-minecraft@server.purduehackers.com:
-          rsync -rlvz --checksum --chmod=D755,F644 -e "ssh -p 10022" pack/ p-minecraft@server.purduehackers.com:pack/
+          rsync -rlvz --checksum -e "ssh -p 10022" site/ p-minecraft@server.purduehackers.com:
+          rsync -rlvz --checksum -e "ssh -p 10022" pack/ p-minecraft@server.purduehackers.com:pack/
 
   linux:
     if: github.event_name == 'push'

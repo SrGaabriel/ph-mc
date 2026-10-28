@@ -52,6 +52,12 @@ if [ -n "${PH_PACK_URL:-}" ]; then
   set_key "$inst/instance.cfg" PreLaunchCommand "\"\\\"\$INST_JAVA\\\" -jar packwiz-installer-bootstrap.jar $PH_PACK_URL\""
 fi
 
+# packwiz-installer's window is Java AWT, which paints solid white under non-reparenting
+# window managers (niri, sway, Hyprland via Xwayland). Harmless elsewhere.
+if [ "$(uname -s)" = Linux ]; then
+  export _JAVA_AWT_WM_NONREPARENTING="${_JAVA_AWT_WM_NONREPARENTING:-1}"
+fi
+
 # No arguments: straight into the game, which joins the server by itself (JoinServerOnLaunch).
 # --launcher opens the launcher window instead, for settings and the like.
 if [ "${1:-}" = "--launcher" ]; then
