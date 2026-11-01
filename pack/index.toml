@@ -1357,7 +1357,7 @@ hash = "e309d5820f95d16e2bcb15ff347876d0193f642cdc1b7dc7a2801cdd1a7e456d"
 
 [[files]]
 file = "kubejs/server_scripts/back.js"
-hash = "a4f170d03c3d1ae2c141bf0a116a9e0673f1745efbc5f96828e9b41875bca1fe"
+hash = "a487ece230d060863456030e0ee288ea39e4001481a7e1cf9f560c3312adda3b"
 
 [[files]]
 file = "kubejs/server_scripts/main.js"

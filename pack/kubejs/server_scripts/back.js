@@ -7,8 +7,12 @@ const BACK_WINDOW_MINUTES = 10;
 // Death spots live in the server's persistent data, keyed by UUID: "dimension|x|y|z|time"
 const backKey = (uuid) => "ph_back_" + uuid;
 
+function uuidOf(entity) {
+  return String(entity.stringUuid || entity.uuid);
+}
+
 function backDimension(level) {
-  return String(level.dimension().location());
+  return String(level.dimension);
 }
 
 EntityEvents.death((event) => {
@@ -16,21 +20,20 @@ EntityEvents.death((event) => {
   if (!entity.isPlayer()) return;
   const level = event.level;
   // Void deaths: there's nothing to go back to, and you'd fall again
-  if (entity.getY() < level.getMinBuildHeight()) return;
+  if (entity.y < level.minBuildHeight) return;
   const spot = [
     backDimension(level),
-    entity.getX(),
-    entity.getY(),
-    entity.getZ(),
+    entity.x,
+    entity.y,
+    entity.z,
     Date.now(),
   ].join("|");
-  event.server.persistentData.putString(backKey(entity.getStringUUID()), spot);
+  event.server.persistentData.putString(backKey(uuidOf(entity)), spot);
 });
 
 PlayerEvents.respawned((event) => {
   const player = event.player;
-  if (!event.server.persistentData.contains(backKey(player.getStringUUID())))
-    return;
+  if (!event.server.persistentData.contains(backKey(uuidOf(player)))) return;
   player.tell(
     Text.gray("Type ")
       .append(Text.yellow("/back"))
@@ -49,14 +52,12 @@ ServerEvents.commandRegistry((event) => {
   event.register(
     Commands.literal("back").executes((ctx) => {
       const player = ctx.source.getPlayerOrException();
-      const server = player.getServer();
+      const server = player.server;
       const data = server.persistentData;
-      const key = backKey(player.getStringUUID());
+      const key = backKey(uuidOf(player));
 
       if (!data.contains(key)) {
-        player.tell(
-          Text.red("Nowhere to go back to. /back works once, after you die."),
-        );
+        player.tell(Text.red("Nowhere to go back to."));
         return 0;
       }
       const [dim, x, y, z, time] = String(data.getString(key)).split("|");
@@ -73,7 +74,7 @@ ServerEvents.commandRegistry((event) => {
       }
 
       data.remove(key);
-      const who = player.getStringUUID();
+      const who = uuidOf(player);
       server.runCommandSilent(`execute in ${dim} run tp ${who} ${x} ${y} ${z}`);
       // You died here once already: a few seconds of grace against the lava or fall that did it
       server.runCommandSilent(
@@ -85,7 +86,7 @@ ServerEvents.commandRegistry((event) => {
       server.runCommandSilent(
         `effect give ${who} minecraft:water_breathing 20 0 true`,
       );
-      player.tell(Text.green("Back where you died. Good luck."));
+      player.tell(Text.green("Back where you died."));
       return 1;
     }),
   );
