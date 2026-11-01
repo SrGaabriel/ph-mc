@@ -1,12 +1,12 @@
 name = "Purdue Hackers"
 author = "Purdue Hackers"
-version = "0.2.3"
+version = "0.2.4"
 pack-format = "packwiz:1.1.0"
 
 [index]
 file = "index.toml"
 hash-format = "sha256"
-hash = "43865445c9f9a6dbadd490d926de83073737793771b765f26dc5e73a9eba7cb3"
+hash = "0c790eeb11e611276ab5479b38678450bf80875c86c96f3ffde9c9601d90a5bf"
 
 [versions]
 minecraft = "1.21.1"
