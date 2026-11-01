@@ -1356,6 +1356,10 @@ file = "kubejs/config/web_server.json"
 hash = "e309d5820f95d16e2bcb15ff347876d0193f642cdc1b7dc7a2801cdd1a7e456d"
 
 [[files]]
+file = "kubejs/server_scripts/back.js"
+hash = "9787b1308f10bf1872851a40fb83cdb7fa43acd1195f66fa518e328f951ba49f"
+
+[[files]]
 file = "kubejs/server_scripts/main.js"
 hash = "dae099ae3be7f033c0c190ee8c3b023b42f6b235d9d0591be5926e8435dbd67f"
 
